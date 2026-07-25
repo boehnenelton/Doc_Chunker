@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Categories — Doc Chunker{% endblock %}
+{% block topbar_title %}Categories{% endblock %}
+
+{% block content %}
+<section class="panel">
+
+  {% if not active_doc %}
+  <div class="empty-state">
+    <div class="empty-state-icon">&#9783;</div>
+    <div class="empty-state-title">No document selected</div>
+    <div class="empty-state-body"><a href="{{ url_for('panel_documents') }}" class="link">Select a document</a> first.</div>
+  </div>
+  {% else %}
+
+  <!-- Add category -->
+  <div class="card">
+    <div class="card-title">Add Category</div>
+    <form action="{{ url_for('cat_add') }}" method="post" class="inline-form">
+      <input type="text" name="name" placeholder="Category name" class="input" required autocomplete="off">
+      <button type="submit" class="btn btn--primary">Add</button>
+    </form>
+  </div>
+
+  <!-- Category list -->
+  {% if cat_rows %}
+  <div class="card">
+    <div class="card-title">Categories in <span class="doc-name-inline">{{ active_doc }}</span></div>
+    <div class="cat-list">
+      {% for cat in cat_rows %}
+      <div class="cat-row">
+        <div class="cat-row-pos">{{ cat.pos }}</div>
+        <div class="cat-row-name">
+          {{ cat.name }}
+          <span class="cat-chunk-count">{{ cat.chk_count }} chunk{{ 's' if cat.chk_count != 1 }}</span>
+        </div>
+        <div class="cat-row-actions">
+          <!-- Move up -->
+          <form action="{{ url_for('cat_move') }}" method="post" class="inline-action">
+            <input type="hidden" name="idx" value="{{ cat.idx }}">
+            <input type="hidden" name="direction" value="up">
+            <button type="submit" class="btn-icon" title="Move up">&#8593;</button>
+          </form>
+          <!-- Move down -->
+          <form action="{{ url_for('cat_move') }}" method="post" class="inline-action">
+            <input type="hidden" name="idx" value="{{ cat.idx }}">
+            <input type="hidden" name="direction" value="down">
+            <button type="submit" class="btn-icon" title="Move down">&#8595;</button>
+          </form>
+          <!-- Delete -->
+          <form action="{{ url_for('cat_del') }}" method="post" class="inline-action"
+                onsubmit="return confirm('Delete category \'{{ cat.name }}\'? It must be empty.')">
+            <input type="hidden" name="idx" value="{{ cat.idx }}">
+            <button type="submit" class="btn-icon btn-icon--danger" title="Delete">&#x2715;</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">&#9783;</div>
+    <div class="empty-state-title">No categories yet</div>
+    <div class="empty-state-body">Add a category above. Categories define the sections of your compiled document.</div>
+  </div>
+  {% endif %}
+
+  {% endif %}
+</section>
+{% endblock %}

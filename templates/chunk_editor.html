@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Edit Chunk — Doc Chunker{% endblock %}
+{% block topbar_title %}Edit Chunk{% endblock %}
+
+{% block topbar_actions %}
+<a href="{{ url_for('panel_chunks') }}" class="topbar-back">&#8592; Chunks</a>
+{% endblock %}
+
+{% block content %}
+<section class="panel panel--editor">
+
+  <div class="editor-header">
+    <div class="editor-meta">
+      <span class="editor-cat">{{ chunk.category }}</span>
+      <span class="editor-sep">/</span>
+      <span class="editor-label">{{ chunk.label }}</span>
+      <span class="editor-id">{{ chunk.id }}</span>
+      {% if chunk.status %}
+      <span class="status-badge status-badge--{{ chunk.status }}">{{ chunk.status }}</span>
+      {% endif %}
+    </div>
+    <div class="editor-nav">
+      {% if chunk.prev_id %}
+      <a href="{{ url_for('chunk_edit', chunk_id=chunk.prev_id) }}" class="btn btn--sm btn--ghost">&#8592; Prev</a>
+      {% endif %}
+      {% if chunk.next_id %}
+      <a href="{{ url_for('chunk_edit', chunk_id=chunk.next_id) }}" class="btn btn--sm btn--ghost">Next &#8594;</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Tag + Status bar -->
+  <div class="editor-meta-bar">
+    <form action="{{ url_for('chunk_tag') }}" method="post" class="inline-form js-editor-subform">
+      <input type="hidden" name="chunk_id" value="{{ chunk.id }}">
+      <input type="hidden" name="content" class="js-editor-content-field">
+      <input type="text" name="tags" value="{{ chunk.tags or '' }}" placeholder="tags (comma-separated)" class="input input--sm" autocomplete="off">
+      <button type="submit" class="btn btn--sm btn--ghost">Set tags</button>
+    </form>
+    <form action="{{ url_for('chunk_set_status') }}" method="post" class="inline-form js-editor-subform">
+      <input type="hidden" name="chunk_id" value="{{ chunk.id }}">
+      <input type="hidden" name="content" class="js-editor-content-field">
+      <select name="status" class="input input--sm">
+        {% for s in ['draft','review','final','skip'] %}
+        <option value="{{ s }}" {% if chunk.status == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn--sm btn--ghost">Set status</button>
+    </form>
+    <form action="{{ url_for('chunk_rename_label') }}" method="post" class="inline-form js-editor-subform">
+      <input type="hidden" name="chunk_id" value="{{ chunk.id }}">
+      <input type="hidden" name="content" class="js-editor-content-field">
+      <input type="text" name="new_label" value="{{ chunk.label }}" placeholder="chunk label" class="input input--sm" autocomplete="off">
+      <button type="submit" class="btn btn--sm btn--ghost">Rename label</button>
+    </form>
+  </div>
+
+  <form action="{{ url_for('chunk_save') }}" method="post" class="editor-form">
+    <input type="hidden" name="chunk_id" value="{{ chunk.id }}">
+    <textarea name="content" class="editor-textarea" spellcheck="true" autofocus>{{ chunk.content }}</textarea>
+    <div class="editor-footer">
+      <div class="editor-stats" id="editor-stats">{{ chunk.content|length }} chars</div>
+      <button type="submit" class="btn btn--primary">Save chunk</button>
+    </div>
+  </form>
+
+</section>
+
+<script>
+(function() {
+  var textarea = document.querySelector('.editor-textarea');
+  var stats    = document.getElementById('editor-stats');
+  if (!textarea || !stats) return;
+  function updateStats() {
+    var chars = textarea.value.length;
+    var words = textarea.value.trim() ? textarea.value.trim().split(/\s+/).length : 0;
+    stats.textContent = chars + ' chars, ' + words + ' words';
+  }
+  textarea.addEventListener('input', updateStats);
+  updateStats();
+
+  // Keep the tag / status / rename-label forms' hidden content field in sync
+  // with the editor textarea, and populate it right before submit, so that
+  // using any of those controls also saves whatever is currently typed in
+  // the content editor instead of discarding it on the redirect.
+  var subForms = document.querySelectorAll('.js-editor-subform');
+  for (var i = 0; i < subForms.length; i++) {
+    subForms[i].addEventListener('submit', function() {
+      var field = this.querySelector('.js-editor-content-field');
+      if (field) {
+        field.value = textarea.value;
+      }
+    });
+  }
+})();
+</script>
+{% endblock %}

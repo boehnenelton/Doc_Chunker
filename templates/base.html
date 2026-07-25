@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>{% block title %}Doc Chunker{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+</head>
+<body>
+
+<!-- ── Overlay (closes drawer) ──────────────────────────────────────────── -->
+<div id="drawer-overlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- ── Drawer ───────────────────────────────────────────────────────────── -->
+<nav id="drawer" class="drawer" aria-label="Main navigation">
+  <div class="drawer-header">
+    <span class="drawer-title">Doc Chunker</span>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu">&#x2715;</button>
+  </div>
+
+  {% if active_doc %}
+  <div class="drawer-active-doc">
+    <span class="drawer-active-label">Active</span>
+    <span class="drawer-active-name">{{ active_doc }}</span>
+    {% if is_mounted %}
+    <span class="drawer-mounted-badge">MOUNTED</span>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="drawer-section-label">Documents</div>
+  <a href="{{ url_for('panel_documents') }}" class="drawer-item {% if request.endpoint == 'panel_documents' %}drawer-item--active{% endif %}">
+    <span class="drawer-icon">&#9776;</span> All Documents
+  </a>
+
+  <div class="drawer-section-label">Structure</div>
+  <a href="{{ url_for('panel_categories') }}" class="drawer-item {% if request.endpoint == 'panel_categories' %}drawer-item--active{% endif %}">
+    <span class="drawer-icon">&#9783;</span> Categories
+  </a>
+  <a href="{{ url_for('panel_chunks') }}" class="drawer-item {% if request.endpoint in ['panel_chunks', 'chunk_edit'] %}drawer-item--active{% endif %}">
+    <span class="drawer-icon">&#9644;</span> Chunks
+  </a>
+
+  <div class="drawer-section-label">Editing</div>
+  <a href="{{ url_for('panel_mount') }}" class="drawer-item {% if request.endpoint in ['panel_mount', 'mount_edit_file'] %}drawer-item--active{% endif %}">
+    <span class="drawer-icon">&#8645;</span> Mount &amp; Edit
+    {% if is_mounted %}<span class="drawer-badge">Live</span>{% endif %}
+  </a>
+
+  <div class="drawer-section-label">Output</div>
+  <a href="{{ url_for('panel_compile') }}" class="drawer-item {% if request.endpoint == 'panel_compile' %}drawer-item--active{% endif %}">
+    <span class="drawer-icon">&#9654;</span> Compile &amp; Export
+  </a>
+
+  <div class="drawer-section-label">Tools</div>
+  <a href="{{ url_for('panel_tools') }}" class="drawer-item {% if request.endpoint in ['panel_tools', 'tools_find', 'tools_stats'] %}drawer-item--active{% endif %}">
+    <span class="drawer-icon">&#9881;</span> Find, Stats &amp; More
+  </a>
+
+  <div class="drawer-footer">
+    <span>Elton Boehnen &middot; boehnenelton2024.pages.dev</span>
+  </div>
+</nav>
+
+<!-- ── App Shell ─────────────────────────────────────────────────────────── -->
+<div class="app-shell">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <button class="hamburger" onclick="openDrawer()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <span class="topbar-title">{% block topbar_title %}Doc Chunker{% endblock %}</span>
+    {% block topbar_actions %}{% endblock %}
+  </header>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container">
+    {% for category, message in messages %}
+    <div class="flash flash--{{ category }}">
+      <span>{{ message }}</span>
+      <button onclick="this.parentElement.remove()" class="flash-close">&#x2715;</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <!-- Main content -->
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

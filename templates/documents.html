@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Documents — Doc Chunker{% endblock %}
+{% block topbar_title %}Documents{% endblock %}
+
+{% block content %}
+<section class="panel">
+
+  <!-- New document form -->
+  <div class="card">
+    <div class="card-title">New Document</div>
+    <form action="{{ url_for('doc_new') }}" method="post" class="inline-form">
+      <input type="text" name="name" placeholder="Document name" class="input" required autocomplete="off">
+      <button type="submit" class="btn btn--primary">Create</button>
+    </form>
+  </div>
+
+  <!-- Document list -->
+  {% if doc_rows %}
+  <div class="card">
+    <div class="card-title">All Documents</div>
+    <div class="doc-list">
+      {% for doc in doc_rows %}
+      <div class="doc-row {% if doc.active %}doc-row--active{% endif %}">
+        <div class="doc-row-main">
+          <div class="doc-row-name">
+            {{ doc.name }}
+            {% if doc.mounted %}<span class="badge badge--mounted">Mounted</span>{% endif %}
+            {% if doc.active %}<span class="badge badge--active">Active</span>{% endif %}
+          </div>
+          <div class="doc-row-meta">{{ doc.cat_count }} categories &middot; {{ doc.chk_count }} chunks</div>
+        </div>
+        <div class="doc-row-actions">
+          {% if not doc.active %}
+          <a href="{{ url_for('doc_sel', idx=doc.idx) }}" class="btn btn--sm btn--ghost">Select</a>
+          {% endif %}
+          <form action="{{ url_for('doc_archive_delete') }}" method="post" class="inline-action"
+                onsubmit="return confirm('Archive and permanently delete \'{{ doc.name }}\'? A zip snapshot will be kept in Document_Project_Archive/, but it will be removed from the app.')">
+            <input type="hidden" name="idx" value="{{ doc.idx }}">
+            <button type="submit" class="btn-icon btn-icon--danger" title="Archive &amp; Delete">&#x2715;</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Duplicate / Rename -->
+  <div class="card card--split">
+
+    <div class="card-half">
+      <div class="card-title">Duplicate</div>
+      <form action="{{ url_for('doc_duplicate') }}" method="post" class="stack-form">
+        <select name="idx" class="input">
+          {% for doc in doc_rows %}
+          <option value="{{ doc.idx }}">{{ doc.idx }}. {{ doc.name }}</option>
+          {% endfor %}
+        </select>
+        <input type="text" name="new_name" placeholder="New name" class="input" autocomplete="off" required>
+        <button type="submit" class="btn btn--secondary">Duplicate</button>
+      </form>
+    </div>
+
+    <div class="card-half">
+      <div class="card-title">Rename</div>
+      <form action="{{ url_for('doc_rename') }}" method="post" class="stack-form">
+        <select name="idx" class="input">
+          {% for doc in doc_rows %}
+          <option value="{{ doc.idx }}">{{ doc.idx }}. {{ doc.name }}</option>
+          {% endfor %}
+        </select>
+        <input type="text" name="new_name" placeholder="New name" class="input" autocomplete="off" required>
+        <button type="submit" class="btn btn--secondary">Rename</button>
+      </form>
+    </div>
+
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">&#9783;</div>
+    <div class="empty-state-title">No documents yet</div>
+    <div class="empty-state-body">Create your first document above to get started.</div>
+  </div>
+  {% endif %}
+
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Stats — Doc Chunker{% endblock %}
+{% block topbar_title %}Document Stats{% endblock %}
+{% block topbar_actions %}
+<a href="{{ url_for('panel_tools') }}" class="topbar-back">&#8592; Tools</a>
+{% endblock %}
+{% block content %}
+<section class="panel">
+  <div class="card">
+    <div class="card-title">Stats</div>
+    <pre class="compiled-preview">{{ result }}</pre>
+  </div>
+</section>
+{% endblock %}

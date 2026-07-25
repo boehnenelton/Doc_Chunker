@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Mount & Edit — Doc Chunker{% endblock %}
+{% block topbar_title %}Mount &amp; Edit{% endblock %}
+
+{% block content %}
+<section class="panel">
+
+  {% if not active_doc %}
+  <div class="empty-state">
+    <div class="empty-state-icon">&#8645;</div>
+    <div class="empty-state-title">No document selected</div>
+    <div class="empty-state-body"><a href="{{ url_for('panel_documents') }}" class="link">Select a document</a> first.</div>
+  </div>
+
+  {% elif not is_mounted %}
+  <!-- Not mounted state -->
+  <div class="card">
+    <div class="card-title">Mount Document</div>
+    <p class="card-body">
+      Mounting explodes <strong>{{ active_doc }}</strong> into individual text files,
+      organized by category. Edit them here or in any text editor.
+      Commit to save changes back to the schema. Discard to abandon.
+    </p>
+    <p class="card-body card-body--warn">
+      Mounts auto-discard after 60 minutes of inactivity.
+    </p>
+    <form action="{{ url_for('mount_do') }}" method="post">
+      <button type="submit" class="btn btn--primary">Mount {{ active_doc }}</button>
+    </form>
+  </div>
+
+  {% else %}
+  <!-- Mounted state -->
+  <div class="card card--mounted-controls">
+    <div class="card-title">
+      {{ active_doc }}
+      <span class="badge badge--mounted">Mounted</span>
+    </div>
+    {% if mount_entry.mounted_at %}
+    <div class="mount-ts">Mounted at {{ mount_entry.mounted_at }}</div>
+    {% endif %}
+    <div class="mount-actions">
+      <form action="{{ url_for('mount_commit') }}" method="post" class="inline-action">
+        <button type="submit" class="btn btn--primary">Commit changes</button>
+      </form>
+      <form action="{{ url_for('mount_discard') }}" method="post" class="inline-action"
+            onsubmit="return confirm('Discard all mounted changes? Schema will not be updated.')">
+        <button type="submit" class="btn btn--danger">Discard</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mounted file list -->
+  {% if mounted_files %}
+  <div class="card">
+    <div class="card-title">Mounted Files</div>
+    <div class="mount-file-list">
+      {% set current_cat = namespace(name='') %}
+      {% for f in mounted_files %}
+        {% if f.category != current_cat.name %}
+        {% set current_cat.name = f.category %}
+        <div class="mount-cat-header">{{ f.category }}</div>
+        {% endif %}
+        <div class="mount-file-row">
+          <div class="mount-file-name">{{ f.filename }}</div>
+          <div class="mount-file-size">{{ f.size }} bytes</div>
+          <a href="{{ url_for('mount_edit_file', path=f.path) }}" class="btn btn--sm btn--ghost">Edit</a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <div class="card">
+    <div class="card-body">No files in Mounted/ directory.</div>
+  </div>
+  {% endif %}
+
+  {% endif %}
+
+</section>
+{% endblock %}

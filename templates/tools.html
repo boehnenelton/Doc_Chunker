@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Tools — Doc Chunker{% endblock %}
+{% block topbar_title %}Tools{% endblock %}
+
+{% block content %}
+<section class="panel">
+
+  {% if not active_doc %}
+  <div class="empty-state">
+    <div class="empty-state-icon">&#9881;</div>
+    <div class="empty-state-title">No document selected</div>
+    <div class="empty-state-body"><a href="{{ url_for('panel_documents') }}" class="link">Select a document</a> first.</div>
+  </div>
+  {% else %}
+
+  <!-- Find -->
+  <div class="card">
+    <div class="card-title">Find in Document</div>
+    <form action="{{ url_for('tools_find') }}" method="post" class="inline-form">
+      <input type="text" name="query" placeholder="Search text..." class="input" required autocomplete="off">
+      <button type="submit" class="btn btn--primary">Search</button>
+    </form>
+  </div>
+
+  <!-- Stats -->
+  <div class="card">
+    <div class="card-title">Document Stats</div>
+    <form action="{{ url_for('tools_stats') }}" method="get" class="inline-form">
+      <button type="submit" class="btn btn--secondary">Show stats for {{ active_doc }}</button>
+    </form>
+  </div>
+
+  <!-- Lock / Unlock -->
+  <div class="card card--split">
+    <div class="card-half">
+      <div class="card-title">Lock Document</div>
+      <p class="card-body">Blocks chunk add/delete/reorder. Compile still works.</p>
+      <form action="{{ url_for('tools_lock') }}" method="post" class="stack-form">
+        <select name="idx" class="input">
+          {% for doc in doc_rows %}
+          <option value="{{ doc.idx }}" {% if doc.name == active_doc %}selected{% endif %}>{{ doc.idx }}. {{ doc.name }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn--secondary">Lock</button>
+      </form>
+    </div>
+    <div class="card-half">
+      <div class="card-title">Unlock Document</div>
+      <p class="card-body">Re-enables all chunk editing operations.</p>
+      <form action="{{ url_for('tools_unlock') }}" method="post" class="stack-form">
+        <select name="idx" class="input">
+          {% for doc in doc_rows %}
+          <option value="{{ doc.idx }}" {% if doc.name == active_doc %}selected{% endif %}>{{ doc.idx }}. {{ doc.name }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn--ghost">Unlock</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Snapshot -->
+  <div class="card">
+    <div class="card-title">Snapshot</div>
+    <p class="card-body">Save a timestamped zip of the current schema and compiled output.</p>
+    <form action="{{ url_for('tools_snapshot') }}" method="post" class="inline-form">
+      <button type="submit" class="btn btn--secondary">Take snapshot of {{ active_doc }}</button>
+    </form>
+    {% if snapshots %}
+    <div class="snapshot-list">
+      <div class="snapshot-list-label">Existing snapshots:</div>
+      {% for snap in snapshots %}
+      <div class="snapshot-row">
+        <span class="snapshot-name">{{ snap }}</span>
+        <form action="{{ url_for('tools_restore_snapshot') }}" method="post" class="inline-action"
+              onsubmit="return confirm('Restore snapshot {{ snap }}? This overwrites current schema.')">
+          <input type="hidden" name="filename" value="{{ snap }}">
+          <button type="submit" class="btn btn--sm btn--danger">Restore</button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Import from file -->
+  <div class="card">
+    <div class="card-title">Import File as Chunks</div>
+    <p class="card-body">Split a text file on a delimiter and create one chunk per segment.</p>
+    <form action="{{ url_for('tools_import_file') }}" method="post" class="stack-form">
+      <input type="text" name="file_path" placeholder="Absolute path to .txt file" class="input" autocomplete="off" required>
+      <input type="text" name="delimiter" placeholder="Delimiter (e.g. --- or \\n\\n)" class="input" value="---" autocomplete="off">
+      <input type="text" name="category" placeholder="Target category name" class="input" autocomplete="off" required>
+      <input type="text" name="label_prefix" placeholder="Chunk label prefix (optional)" class="input" autocomplete="off">
+      <button type="submit" class="btn btn--secondary">Import</button>
+    </form>
+  </div>
+
+  <!-- Merge docs -->
+  <div class="card">
+    <div class="card-title">Merge Documents</div>
+    <p class="card-body">Stitch compiled output from multiple docs into one file.</p>
+    <form action="{{ url_for('tools_merge') }}" method="post" class="stack-form">
+      <input type="text" name="idx_list" placeholder="Doc indexes, comma-separated (e.g. 1,3,4)" class="input" autocomplete="off" required>
+      <input type="text" name="output_name" placeholder="Output document name" class="input" autocomplete="off" required>
+      <button type="submit" class="btn btn--secondary">Merge</button>
+    </form>
+  </div>
+
+  {% endif %}
+</section>
+{% endblock %}

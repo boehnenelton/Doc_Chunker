@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Edit File — Doc Chunker{% endblock %}
+{% block topbar_title %}Edit File{% endblock %}
+
+{% block topbar_actions %}
+<a href="{{ url_for('panel_mount') }}" class="topbar-back">&#8592; Mount</a>
+{% endblock %}
+
+{% block content %}
+<section class="panel panel--editor">
+
+  <div class="editor-header">
+    <div class="editor-meta">
+      <span class="editor-cat">{{ category }}</span>
+      <span class="editor-sep">/</span>
+      <span class="editor-label">{{ filename }}</span>
+    </div>
+  </div>
+
+  <form action="{{ url_for('mount_save_file') }}" method="post" class="editor-form">
+    <input type="hidden" name="rel_path" value="{{ rel_path }}">
+    <textarea name="content" class="editor-textarea" spellcheck="true" autofocus>{{ content }}</textarea>
+    <div class="editor-footer">
+      <div class="editor-stats" id="editor-stats">{{ content|length }} chars</div>
+      <div class="editor-footer-actions">
+        <a href="{{ url_for('panel_mount') }}" class="btn btn--ghost">Cancel</a>
+        <button type="submit" class="btn btn--primary">Save file</button>
+      </div>
+    </div>
+  </form>
+
+</section>
+
+<script>
+(function() {
+  var textarea = document.querySelector('.editor-textarea');
+  var stats    = document.getElementById('editor-stats');
+  if (!textarea || !stats) return;
+  function updateStats() {
+    var chars = textarea.value.length;
+    var words = textarea.value.trim() ? textarea.value.trim().split(/\s+/).length : 0;
+    stats.textContent = chars + ' chars, ' + words + ' words';
+  }
+  textarea.addEventListener('input', updateStats);
+  updateStats();
+})();
+</script>
+{% endblock %}

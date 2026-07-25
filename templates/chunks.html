@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Chunks — Doc Chunker{% endblock %}
+{% block topbar_title %}Chunks{% endblock %}
+
+{% block content %}
+<section class="panel">
+
+  {% if not active_doc %}
+  <div class="empty-state">
+    <div class="empty-state-icon">&#9644;</div>
+    <div class="empty-state-title">No document selected</div>
+    <div class="empty-state-body"><a href="{{ url_for('panel_documents') }}" class="link">Select a document</a> first.</div>
+  </div>
+  {% elif not grouped %}
+  <div class="empty-state">
+    <div class="empty-state-icon">&#9644;</div>
+    <div class="empty-state-title">No categories yet</div>
+    <div class="empty-state-body"><a href="{{ url_for('panel_categories') }}" class="link">Add a category</a> before adding chunks.</div>
+  </div>
+  {% else %}
+
+  <!-- Add chunk -->
+  <div class="card">
+    <div class="card-title">Add Chunk</div>
+    <form action="{{ url_for('chunk_add') }}" method="post" class="inline-form">
+      <select name="category" class="input">
+        {% for name in cat_names %}
+        <option value="{{ name }}">{{ name }}</option>
+        {% endfor %}
+      </select>
+      <input type="text" name="label" placeholder="Label (optional)" class="input" autocomplete="off">
+      <button type="submit" class="btn btn--primary">Add</button>
+    </form>
+  </div>
+
+  <!-- Chunks grouped by category -->
+  {% for group in grouped %}
+  <div class="card">
+    <div class="card-title">
+      <span class="cat-pos-badge">{{ group.cat_pos }}</span>
+      {{ group.cat_name }}
+      <span class="cat-chunk-count">{{ group.chunks|length }} chunk{{ 's' if group.chunks|length != 1 }}</span>
+    </div>
+
+    {% if group.chunks %}
+    <div class="chunk-list">
+      {% for chunk in group.chunks %}
+      <div class="chunk-row {% if chunk.empty %}chunk-row--empty{% endif %}">
+        <div class="chunk-row-pos">{{ chunk.pos }}</div>
+        <div class="chunk-row-body">
+          <div class="chunk-row-label">
+            {{ chunk.label }}
+            {% if chunk.empty %}<span class="badge badge--warn">Empty</span>{% endif %}
+          </div>
+          <div class="chunk-row-preview">{{ chunk.preview }}{% if chunk.preview %}…{% endif %}</div>
+        </div>
+        <div class="chunk-row-actions">
+          <!-- Edit -->
+          <a href="{{ url_for('chunk_edit', chunk_id=chunk.id) }}" class="btn-icon btn-icon--edit" title="Edit">&#9998;</a>
+          <!-- Move up -->
+          <form action="{{ url_for('chunk_move') }}" method="post" class="inline-action">
+            <input type="hidden" name="chunk_id" value="{{ chunk.id }}">
+            <input type="hidden" name="direction" value="up">
+            <button type="submit" class="btn-icon" title="Move up">&#8593;</button>
+          </form>
+          <!-- Move down -->
+          <form action="{{ url_for('chunk_move') }}" method="post" class="inline-action">
+            <input type="hidden" name="chunk_id" value="{{ chunk.id }}">
+            <input type="hidden" name="direction" value="down">
+            <button type="submit" class="btn-icon" title="Move down">&#8595;</button>
+          </form>
+          <!-- Delete -->
+          <form action="{{ url_for('chunk_del') }}" method="post" class="inline-action"
+                onsubmit="return confirm('Delete chunk \'{{ chunk.label }}\'?')">
+            <input type="hidden" name="chunk_id" value="{{ chunk.id }}">
+            <button type="submit" class="btn-icon btn-icon--danger" title="Delete">&#x2715;</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Reparent row (collapsed, expand on demand) -->
+      <div class="reparent-row" id="reparent-{{ chunk.id }}">
+        <form action="{{ url_for('chunk_reparent') }}" method="post" class="inline-form">
+          <input type="hidden" name="chunk_id" value="{{ chunk.id }}">
+          <select name="new_category" class="input input--sm">
+            {% for name in cat_names %}
+            <option value="{{ name }}" {% if name == group.cat_name %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn--sm btn--secondary">Move to</button>
+          <button type="button" class="btn btn--sm btn--ghost" onclick="toggleReparent('{{ chunk.id }}')">Cancel</button>
+        </form>
+      </div>
+
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="cat-empty">No chunks in this category yet.</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  {% endif %}
+</section>
+{% endblock %}

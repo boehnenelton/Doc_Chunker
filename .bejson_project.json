@@ -1,0 +1,59 @@
+{
+  "Format": "BEJSON",
+  "Format_Version": "104a",
+  "Format_Creator": "Elton Boehnen",
+  "Session_Id": "e0a82f28-bb11-4db9-bd86-f68e43511c2a",
+  "Project_Name": "CLI_Doc_Chunker",
+  "Project_Modified_Date": "2026-07-25T06:04:18Z",
+  "Project_Description": "Document management system and project directory bundler built on BEJSON 104db.",
+  "Schema_Version": "2.3.0",
+  "Records_Type": [
+    "RootPackage"
+  ],
+  "Fields": [
+    {
+      "name": "change_log",
+      "type": "string"
+    },
+    {
+      "name": "date_changed",
+      "type": "string"
+    },
+    {
+      "name": "change_notes",
+      "type": "string"
+    }
+  ],
+  "Values": [
+    [
+      "v2.2.0 pkg001",
+      "2026-07-16T07:05:00Z",
+      "Initial registration of CLI_Doc_Chunker in ecosystem."
+    ],
+    [
+      "v2.2.1 pkg002",
+      "2026-07-16T07:10:00Z",
+      "Ingested combined GEMINI policies from NewAgent Global context into document database project GEMINI_Policies under category Core_Policies."
+    ],
+    [
+      "v2.2.2 pkg003",
+      "2026-07-16T07:22:00Z",
+      "Added categories CLAUDE and REACT. Imported CLAUDE.md and React_Policy OFC.md from dev/Policy. Applied specific tags 'claude' and 'react' to imported chunks in GEMINI_Policies database. Compiled updated document project."
+    ],
+    [
+      "v2.3.0 pkg004",
+      "2026-07-22T11:44:00Z",
+      "Fixed 4 reported bugs: (1) chunk_tag/chunk_set_status now auto-save in-progress editor content before redirecting; (2) added cmd_doc_archive_delete + /doc/archive-delete route to archive-then-remove a managed document; (3) added cmd_doc_chunk_rename_label + /chunks/rename-label route; (4) fixed aliasing bug in _shift_chunk_pos causing chunk move up/down to corrupt index_pos. Used the new archive-delete feature to remove managed documents GEMINI_Policies, Testing, and stray '.be.json' from Document_Project/, leaving only Chunked_Policy. Archived copies kept in Document_Project_Archive/."
+    ],
+    [
+      "v2.3.0 pkg005",
+      "2026-07-22T11:47:00Z",
+      "Spell/grammar-checked and rewrote 5 of 6 chunks in Chunked_Policy (Lead Developer, Purposeful Speech, Goal_Driven, High Standards, Low Confidence) for clarity and directness as LLM system instructions. Corrected garbled voice-transcription artifacts (e.g. 'emote down checklist' -> 'a Markdown checklist'). Dropped one incomplete trailing sentence in High Standards ('A variable example, that writes to a specific') that was cut off in the source with no way to recover the intended ending. Left 'Assume The Worst' chunk empty (no source content existed) and did not invent replacement text. Recompiled Chunked_Policy.md."
+    ],
+    [
+      "v2.3.0 pkg006",
+      "2026-07-25T06:04:18Z",
+      "Initialized git repository. Injected Session_Id e0a82f28-bb11-4db9-bd86-f68e43511c2a into BEJSON project header. First commit and push to GitHub remote boehnenelton/Doc_Chunker."
+    ]
+  ]
+}

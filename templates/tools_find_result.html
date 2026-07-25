@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Search Results — Doc Chunker{% endblock %}
+{% block topbar_title %}Search Results{% endblock %}
+{% block topbar_actions %}
+<a href="{{ url_for('panel_tools') }}" class="topbar-back">&#8592; Tools</a>
+{% endblock %}
+{% block content %}
+<section class="panel">
+  <div class="card">
+    <div class="card-title">Results for: <span style="color:#fff;font-weight:400">{{ query }}</span></div>
+    <pre class="compiled-preview">{{ result }}</pre>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Compile & Export — Doc Chunker{% endblock %}
+{% block topbar_title %}Compile &amp; Export{% endblock %}
+
+{% block content %}
+<section class="panel">
+
+  {% if not active_doc %}
+  <div class="empty-state">
+    <div class="empty-state-icon">&#9654;</div>
+    <div class="empty-state-title">No document selected</div>
+    <div class="empty-state-body"><a href="{{ url_for('panel_documents') }}" class="link">Select a document</a> first.</div>
+  </div>
+  {% else %}
+
+  <!-- Compile controls -->
+  <div class="card">
+    <div class="card-title">Compile</div>
+    <p class="card-body">
+      Renders <strong>{{ active_doc }}</strong> into a Markdown document with auto-generated
+      table of contents. Categories become sections; chunks are laid out in index order within each section.
+    </p>
+    {% if is_mounted %}
+    <p class="card-body card-body--warn">Document is currently mounted. Commit or discard changes before compiling.</p>
+    {% endif %}
+    <form action="{{ url_for('compile_do') }}" method="post">
+      <button type="submit" class="btn btn--primary" {% if is_mounted %}disabled{% endif %}>Compile {{ active_doc }}</button>
+    </form>
+  </div>
+
+  <!-- Filtered compile -->
+  <div class="card">
+    <div class="card-title">Filtered Compile</div>
+    <p class="card-body">Compile only chunks matching a tag, a status, or both. Chunks with status <code>skip</code> are always excluded.</p>
+    <form action="{{ url_for('compile_filtered') }}" method="post" class="stack-form">
+      <input type="text" name="filter_tag" placeholder="Tag filter (e.g. public)" class="input" autocomplete="off">
+      <select name="filter_status" class="input">
+        <option value="">-- Any status --</option>
+        <option value="draft">draft</option>
+        <option value="review">review</option>
+        <option value="final">final</option>
+      </select>
+      <button type="submit" class="btn btn--secondary" {% if is_mounted %}disabled{% endif %}>Filtered Compile</button>
+    </form>
+  </div>
+
+  <!-- Export controls -->
+  <div class="card">
+    <div class="card-title">Export</div>
+    <form action="{{ url_for('compile_export') }}" method="post" class="stack-form">
+      <select name="idx" class="input">
+        {% for doc in doc_rows %}
+        <option value="{{ doc.idx }}" {% if doc.name == active_doc %}selected{% endif %}>{{ doc.idx }}. {{ doc.name }}</option>
+        {% endfor %}
+      </select>
+      <div class="format-row">
+        <label class="radio-label">
+          <input type="radio" name="format" value="md" checked> Markdown (.md)
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="format" value="txt"> Plain text (.txt)
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="format" value="json"> JSON (.json)
+        </label>
+      </div>
+      <button type="submit" class="btn btn--secondary">Export</button>
+    </form>
+
+    {% if active_doc %}
+    <div class="export-downloads">
+      <div class="export-downloads-label">Download last export:</div>
+      <div class="download-links">
+        <a href="{{ url_for('compile_download', doc_name=active_doc, fmt='md') }}" class="btn btn--sm btn--ghost">&#8595; .md</a>
+        <a href="{{ url_for('compile_download', doc_name=active_doc, fmt='txt') }}" class="btn btn--sm btn--ghost">&#8595; .txt</a>
+        <a href="{{ url_for('compile_download', doc_name=active_doc, fmt='json') }}" class="btn btn--sm btn--ghost">&#8595; .json</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Compiled preview -->
+  {% if compiled_output %}
+  <div class="card">
+    <div class="card-title">
+      Compiled Output
+      <span class="card-title-meta">{{ compiled_path }}</span>
+    </div>
+    <pre class="compiled-preview">{{ compiled_output }}</pre>
+  </div>
+  {% else %}
+  <div class="card">
+    <div class="card-body">No compiled output yet. Run compile above.</div>
+  </div>
+  {% endif %}
+
+  {% endif %}
+</section>
+{% endblock %}
