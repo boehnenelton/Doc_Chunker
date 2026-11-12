@@ -101,3 +101,27 @@ archive-delete, tools/find, tools/stats) rendered through the templates in
 `Doc_Chunker.py` directly — there is no parallel web-only implementation of
 any command, so behavior (including the mount TTL cleanup and archive
 safety) is identical between CLI and web use.
+
+### Visual Interface Walkthrough
+
+#### Document Projects Dashboard (`/`)
+![Document Projects Dashboard](assets/screenshot_doc_manager.png)
+
+#### Navigation Drawer
+![Navigation Drawer](assets/screenshot_drawer_nav.png)
+
+#### Chunks Overview (`/chunks`)
+![Chunks Overview](assets/screenshot_chunks_overview.png)
+
+#### Chunk Editor (`/chunks/edit/<chunk_id>`)
+![Chunk Editor](assets/screenshot_chunk_editor.png)
+
+#### Category Management (`/categories`)
+![Category Management](assets/screenshot_categories_panel.png)
+
+#### Markdown Compiler & Export (`/compile`)
+![Markdown Compiler & Export](assets/screenshot_compile_panel.png)
+
+#### Tools & Utility Hub (`/tools`)
+![Tools & Utility Hub](assets/screenshot_tools_hub.png)
+

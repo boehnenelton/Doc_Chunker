@@ -26,6 +26,7 @@ Changelog:
            /doc/archive-delete route (archive-then-remove a managed document).
 """
 
+import os
 import sys
 import json
 import logging
@@ -675,4 +676,6 @@ def compile_filtered():
 # ══════════════════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5050, debug=DEBUG_MODE)
+    host = os.environ.get("HOST", "0.0.0.0")
+    port = int(os.environ.get("PORT", "5050"))
+    app.run(host=host, port=port, debug=DEBUG_MODE)

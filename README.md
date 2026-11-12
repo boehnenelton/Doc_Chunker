@@ -100,6 +100,43 @@ Imports `Doc_Chunker` directly as a module (`import Doc_Chunker as DC`) —
 every route calls the same functions the CLI uses, so state (active
 document, mount status) is shared between both interfaces.
 
+### Web Interface Gallery
+
+#### 1. Document Projects Dashboard
+Overview of managed document projects, active document selector, project stats, and document creation.
+
+![Document Projects Dashboard](docs/assets/screenshot_doc_manager.png)
+
+#### 2. Navigation Drawer
+Drawer navigation providing direct access to Documents, Categories, Chunks, Mount sessions, Compiler, and Tools.
+
+![Navigation Drawer](docs/assets/screenshot_drawer_nav.png)
+
+#### 3. Chunks Overview
+Category-grouped view of document chunks with status indicators, content previews, reordering, and tagging.
+
+![Chunks Overview](docs/assets/screenshot_chunks_overview.png)
+
+#### 4. Chunk Editor
+Interactive editor for individual chunks with real-time labeling, category assignment, workflow status, and tags.
+
+![Chunk Editor](docs/assets/screenshot_chunk_editor.png)
+
+#### 5. Category Management
+Hierarchical category sequencing, category creation, position adjustment, and deletion guards.
+
+![Category Management](docs/assets/screenshot_categories_panel.png)
+
+#### 6. Markdown Compiler & Multi-Format Export
+Single-click compilation to clean Markdown with auto-generated table of contents, and multi-format exports (MD, Plain Text, JSON).
+
+![Markdown Compiler & Export](docs/assets/screenshot_compile_panel.png)
+
+#### 7. Tools & Utility Hub
+Full-text search across all chunks, word count and complexity statistics, snapshot zip creation, and document locking.
+
+![Tools & Utility Hub](docs/assets/screenshot_tools_hub.png)
+
 ## Project Structure
 
 ```

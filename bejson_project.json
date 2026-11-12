@@ -4,9 +4,9 @@
   "Format_Creator": "Elton Boehnen",
   "Session_Id": "e0a82f28-bb11-4db9-bd86-f68e43511c2a",
   "Project_Name": "CLI_Doc_Chunker",
-  "Project_Modified_Date": "2026-11-12T07:39:01Z",
+  "Project_Modified_Date": "2026-11-12T07:46:56Z",
   "Project_Description": "Document management system and project directory bundler built on BEJSON 104db.",
-  "Schema_Version": "2.4.0",
+  "Schema_Version": "2.4.1",
   "Records_Type": [
     "RootPackage"
   ],
@@ -59,6 +59,11 @@
       "v2.4.0 pkg007",
       "2026-11-12T07:39:01Z",
       "Standalone build: embedded all lib_bejson_* dependencies (Core & Utility families) directly into Doc_Chunker.py with types.SimpleNamespace shims for zero-dependency standalone execution. Synchronized lib/ with latest canonical libraries_104 releases."
+    ],
+    [
+      "v2.4.1 pkg008",
+      "2026-11-12T07:46:56Z",
+      "Added Playwright automated screenshot capture suite (dev/capture_screenshots.py) using native headless Chromium on Termux. Captured 7 high-resolution UI screenshots into docs/assets/ and embedded interactive visual galleries across README.md and docs/usage-guide.md."
     ]
   ],
   "Type": "python",
