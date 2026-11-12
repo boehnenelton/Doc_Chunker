@@ -1,13 +1,21 @@
 """
-Library:        lib_bejson_Core_bejson_errors.py
-Family:         Core
-Description:    Unified error registry for BEJSON ecosystem.
-Version:        2.3.0
-Date:           2026-06-29
-Author:         Elton Boehnen
-Contact:        eltonboehnen@gmail.com | boehnenelton2024.pages.dev | github.com/boehnenelton
-Format_Creator: Elton Boehnen
-RELATIONAL_ID:  c918d766-8f2a-4ab7-95f3-4942cbb4b45f
+Library:         lib_bejson_Core_bejson_errors.py
+Family:          Core
+Module Purpose:  Unified numeric error-code registry shared by the BEJSON, MFDB and Nesting modules.
+Architecture:    Shared numeric error-code registry. Codes are grouped by layer (BEJSON validation/core, MFDB, Nesting); a code name containing MFDB does not make the module that raises it MFDB-specific.
+Format_Scope:    All layers (registry only)
+Glossary:        BEJSON 104, 104a and 104db are the three file formats (Format_Version). 104db = ONE file holding 2+ entity types
+                 (Record_Type_Parent discriminator, null-padding). MFDB is NOT a format and NOT 104db: it is a layer made of one 104a manifest
+                 (104a.mfdb.bejson) plus dense 104 entity files linked by Parent_Hierarchy. MFDB-132 = an MFDB packed into one Chunked-104a document.
+Version:         2.5.0
+Release_Version: 300
+Date:            2026-10-16
+Author:          Elton Boehnen · boehnenelton2024@gmail.com · boehnenelton2024.pages.dev · github.com/boehnenelton
+Format_Creator:  Elton Boehnen
+RELATIONAL_ID:   61fc188e-ccb2-448b-85a0-b3bdb0e224ab
+Changelog:
+  2.5.0 (2026-10-16) - Added the Core nesting codes E_NESTING_* (130-139), moved here from the removed lib_bejson_Core_bejson_nesting_errors.py.
+          Core now resolves every error code through this single file. Codes, names and values unchanged.
 """
 
 # ---------------------------------------------------------------------------
@@ -31,7 +39,7 @@ E_ATOMIC_WRITE_FAILED                = 15
 E_INVALID_FORMAT_CREATOR             = 16
 
 # BEJSON Core ops (17-29)
-# Codes 17-19: parse/serialization layer — added v2.3.0 (parity with TS v2.3.0)
+# Codes 17-19: parse/serialization layer (same codes as TS)
 E_CORE_PARSE_ERROR                   = 17
 E_CORE_SERIALIZATION_ERROR           = 18
 E_CORE_NULL_DOCUMENT                 = 19
@@ -70,7 +78,7 @@ E_MFDB_INVALID_ARCHIVE               = 42
 
 # ---------------------------------------------------------------------------
 # MFDB Core ops (50-72)
-# Codes 57-60: added v2.3.0 (parity with TS MFDB_CORE_CODES v2.3.0)
+# Codes 57-60 match TS MFDB_CORE_CODES
 # ---------------------------------------------------------------------------
 E_MFDB_CORE_MANIFEST_NOT_FOUND       = 50
 E_MFDB_CORE_ENTITY_NOT_FOUND         = 51
@@ -88,23 +96,21 @@ E_MFDB_CORE_MOUNT_CONFLICT           = 71
 E_MFDB_CORE_CREATE_FAILED            = 72
 
 # ---------------------------------------------------------------------------
-# Core_Nesting (130-159)
+# Core nesting (130-159)
+# Nested BEJSON 104 (embedded 104 cells). Part of the Core family; resolved here,
+# there is no separate nesting errors file.
 # ---------------------------------------------------------------------------
-E_NESTING_INVALID_CELL               = 130
-E_NESTING_NOT_BEJSON                 = 131
-E_NESTING_DEPTH_EXCEEDED             = 132
-E_NESTING_CACHE_MISS                 = 133
-E_NESTING_SCHEMA_MISMATCH            = 134
-E_NESTING_CIRCULAR_REF               = 135
-E_NESTING_VALIDATION_FAILED          = 136
-E_NESTING_FIELD_MAP_FAILED           = 137
+E_NESTING_INVALID_CELL               = 130  # Cell address out of bounds for mutation
+E_NESTING_NOT_BEJSON                 = 131  # Doc argument is not a dict
+E_NESTING_DEPTH_EXCEEDED             = 132  # Recursion hit NESTING_MAX_DEPTH
+E_NESTING_CACHE_MISS                 = 133  # Address not found in NestMap (informational)
+E_NESTING_SCHEMA_MISMATCH            = 134  # Column schema uniformity violation
+E_NESTING_CIRCULAR_REF               = 135  # Same fingerprint seen twice in walk path
+E_NESTING_VALIDATION_FAILED          = 136  # Nested doc fails 104 validation rules
+E_NESTING_FIELD_MAP_FAILED           = 137  # Could not build field map for nested doc
+E_NESTING_QUERY_INVALID_PATH         = 138  # Path string failed grammar parse
+E_NESTING_QUERY_EMPTY_PATH           = 139  # Path was empty / whitespace only
 
-# ---------------------------------------------------------------------------
-# Cognition (270-289)
-# ---------------------------------------------------------------------------
-E_COGNITION_INVALID_MATRIX           = 270
-E_COGNITION_AGENT_NOT_FOUND          = 271
-E_COGNITION_INDEX_MISSING            = 272
-E_COGNITION_PATCH_FAILED             = 273
-E_COGNITION_SCHEMA_VIOLATION         = 274
-E_COGNITION_LOCK_TIMEOUT             = 275
+# 140-159 reserved for future Core nesting codes.
+
+# Cognition codes moved to lib_bejson_Cognition_bejson_errors.py (v2.4.0)

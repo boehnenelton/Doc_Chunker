@@ -1,13 +1,14 @@
 """
-Library:        lib_bejson_Utility_bejson_utility.py
-Family:         Utility
-Description:    Cross-compatible chunking utilities for CLI_CHUNKER and MFDB_V5.
-Version:        2.3.2
-Date:           2026-06-07
-Author:         Elton Boehnen
-Contact:        eltonboehnen@gmail.com | boehnenelton2024.pages.dev | github.com/boehnenelton
-Format_Creator: Elton Boehnen
-RELATIONAL_ID:  8c238631-8903-4acf-85b7-b5c446a3375f
+Library:         lib_bejson_Utility_bejson_utility.py
+Family:          Utility
+Module Purpose:  Implements runtime functionality and logic for lib_bejson_Utility_bejson_utility.py.
+Architecture:    BEJSON 104db provides single-file multi-entity relational storage with positional null-padding, Record_Type_Parent discriminator headers, and plain-text LLM readability.
+Version:         2.4.0
+Release_Version: 300
+Date:            2026-08-07
+Author:          Elton Boehnen · boehnenelton2024@gmail.com · boehnenelton2024.pages.dev · github.com/boehnenelton
+Format_Creator:  Elton Boehnen
+RELATIONAL_ID:   374393bb-559d-4444-959f-a679b80d95f7
 """
 
 import os
@@ -25,6 +26,8 @@ CORE_DIR = os.path.join(PARENT_LIB_DIR, "Core")
 if CORE_DIR not in sys.path:
     sys.path.append(CORE_DIR)
 
+from lib_bejson_Core_bejson_path_guard import bejson_safe_join
+
 try:
     import lib_bejson_Core_bejson_core as BEJSONCore
 except ImportError:
@@ -35,6 +38,17 @@ except ImportError:
     except ImportError:
         print("CRITICAL: lib_bejson_Core_bejson_core still not found.")
         raise
+
+try:
+    # SCHEMA_MFDB_ENTITY was a byte-identical duplicate of Core's
+    # SCHEMA_MFDB_ENTITY_v5 (verified 2026-07-22, see
+    # BEJSON/Reports/FIX_SCHEMA_MFDB_ENTITY_DUPLICATE.md). Import the Core
+    # definition under the local name instead of maintaining a second copy
+    # that can silently drift from it.
+    from lib_bejson_Core_bejson_schema import SCHEMA_MFDB_ENTITY_v5 as SCHEMA_MFDB_ENTITY
+except ImportError:
+    print("CRITICAL: lib_bejson_Core_bejson_schema (SCHEMA_MFDB_ENTITY_v5) not found.")
+    raise
 
 # ---------------------------------------------------------------------------
 # Constants & Official Schemas
@@ -60,14 +74,8 @@ SCHEMA_CLI_CHUNKER = [
 ]
 
 # Official MFDB_V5 Entity Schema (BEJSON 104)
-SCHEMA_MFDB_ENTITY = [
-    {"name": "version",   "type": "string"},
-    {"name": "file_path", "type": "string"},
-    {"name": "file_name", "type": "string"},
-    {"name": "content",   "type": "string"},
-    {"name": "is_binary", "type": "boolean"},
-    {"name": "is_base64", "type": "boolean"},
-]
+# Imported from lib_bejson_Core_bejson_schema.SCHEMA_MFDB_ENTITY_v5 above —
+# do not redefine locally; that was the duplicate this fix removed.
 
 # ---------------------------------------------------------------------------
 # Data Sanitization (Best Practices - No Regex)
@@ -225,24 +233,33 @@ def bejson_utility_unchunk_from_text(text: str, output_dir: str) -> int:
     """Restores files from a text block using strictly string splitting."""
     count = 0
     out_root = Path(output_dir).resolve()
-    
+
     # Split by the start separator
     parts = text.split(SEP_START)
-    
+
     for part in parts:
         if not part.strip(): continue
-        
+
         # Each part starts with: filename --- content
         if SEP_END in part:
             header, content = part.split(SEP_END, 1)
             rel_path = header.strip()
-            
+
             if rel_path:
-                target_file = out_root / rel_path
+                # LIB-CH-M2 fix (2026-08-07):
+                # (1) traversal -- same unguarded `out_root / rel_path`
+                # class as LIB-C1, now routed through bejson_safe_join.
+                # (2) content.lstrip("\n") stripped ALL leading newlines,
+                # not just the single one the SEP_END split introduces --
+                # a file that legitimately starts with blank lines lost
+                # them. Now strips at most the one separator artifact.
+                target_file = Path(bejson_safe_join(str(out_root), rel_path))
                 target_file.parent.mkdir(parents=True, exist_ok=True)
-                target_file.write_text(content.lstrip("\n"), encoding="utf-8")
+                if content.startswith("\n"):
+                    content = content[1:]
+                target_file.write_text(content, encoding="utf-8")
                 count += 1
-                
+
     return count
 
 # ---------------------------------------------------------------------------

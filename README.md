@@ -51,8 +51,9 @@ pip install flask
 
 No other third-party dependencies — everything else used (`argparse`,
 `zipfile`, `difflib`, `uuid`, `shutil`, `pathlib`, etc.) is Python standard
-library. The BEJSON core/validator/utility libraries the tool depends on
-ship in `lib/`.
+library. The BEJSON core/validator/utility libraries are embedded directly in
+`Doc_Chunker.py` for zero-dependency standalone execution, with synced canonical
+copies also provided in `lib/`.
 
 ## Usage
 
